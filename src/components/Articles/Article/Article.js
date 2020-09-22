@@ -4,6 +4,7 @@ import styles from './Article.module.css';
 
 
 const article = props => {
+    console.log("article")
 
     return(
         <div className={styles.article}>

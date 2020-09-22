@@ -1,43 +1,89 @@
 import React, { Component } from 'react';
 import './App.css';
-import Articles from '../components/Articles/Articles';
-import Header from '../components/Header/Header';
+import Employees from '../components/Employees/Employees';
+import axios from 'axios';
+import EmployeeDetails from '../components/Employees/EmployeeDetails/EmployeeDetails';
 
 class App extends Component {
 
   state = {
-    articles: [
-      {id: "1", title: "title1", content: "This is content 1"},
-      {id: "2", title: "title2", content: "This is content 2"},
-      {id: "3", title: "title3", content: "This is content 3"},
-      {id: "4", title: "title4", content: "This is content 4"}
-    ],
-    showArticles: false
+    employees: [],
+    selectedEmployee: null
   }
 
-  toggleArticlesHandler = () => {
-    const doesShow = this.state.showArticles;
-    this.setState({showArticles: !doesShow});
+
+  componentDidMount() {
+
+    axios.get("http://dummy.restapiexample.com/api/v1/employees", null).then(response => {
+        const employees = response.data.data;
+        this.setState({employees: employees});
+    });
 
   }
 
-  deleteArticleHandler = (articleIndex) => {
-    const articles = [...this.state.articles];
-    articles.splice(articleIndex, 1);
-    this.setState({articles: articles});
+  showSelectedEmployeeHandler = (id) => {
+    console.log("Employee nr: " + id);
+    /* axios.get("http://dummy.restapiexample.com/api/v1/employee/" + id).then(
+      response => {
+        this.setState({selectedEmployee: response.data});
+      }
+    );  */
+
+    this.setState({selectedEmployee: this.state.employees.find(x => x.id === id)});
+  }
+
+  saveEmployeeHandler = () => {
+    const employeeToSave = {
+      name: "Maria123",
+      salary: "4500",
+      age: "25"
+    }
+
+    axios.post("http://dummy.restapiexample.com/api/v1/create", employeeToSave).then(response => {
+      console.log(response);
+    });
+  }
+
+  deleteEmployeeHandler = () => {
+    const id = 2;
+    axios.delete("http://dummy.restapiexample.com/api/v1/delete/" + id).then(
+      response => {
+        console.log(response);
+      }
+    );
+  }
+
+  updateEmployeeHandler = () => {
+    const id = 2;
+    const employeeToUpdate = {name: "test1", salary: "1123", age:"23"};
+
+    axios.put("http://dummy.restapiexample.com/api/v1/update/" + id, employeeToUpdate).then(
+      response => {
+        console.log(response);
+      }
+    )
   }
 
   render(){
-    
-    let articles = null;
-    if(this.state.showArticles) {
-      articles = <Articles articles={this.state.articles} deleteArticle={this.deleteArticleHandler} />
+   
+    let selectedEmployee = null;
+
+    if(this.state.selectedEmployee !== null) {
+      selectedEmployee = <EmployeeDetails 
+      name={this.state.selectedEmployee.employee_name}
+      salary={this.state.selectedEmployee.employee_salary}
+      age={this.state.selectedEmployee.employee_age}
+      />
     }
-     
-    return (
+
+    return (     
       <div className='App'>
-        <Header showArticles={this.state.showArticles} toggleArticles={this.toggleArticlesHandler} />
-        {articles}
+        {selectedEmployee}
+        <h1>Employees</h1>
+        <Employees employees={this.state.employees} showSelectedEmployee={this.showSelectedEmployeeHandler} />
+        <button onClick={this.saveEmployeeHandler} className="UpdateButton">Save Employee</button>
+        <button onClick={this.deleteEmployeeHandler} className="UpdateButton">Delete Employee</button>
+        <button onClick={this.updateEmployeeHandler} className="UpdateButton">Update Employee</button>
       </div>
     );
   }

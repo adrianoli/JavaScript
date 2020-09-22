@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-logo {
@@ -76,3 +78,7 @@
   color: #326647;
 }
 
+.UpdateButton {
+  margin: auto;
+  margin-bottom: 10px;
+}
